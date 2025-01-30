@@ -3,12 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Design Services Calculator</title>
+    <title>Design Price Calculator</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
         .quote-text {
             white-space: pre-wrap;
             font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        }
+        #response {
+            white-space: pre-wrap;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+        #response strong {
+            display: block;
+            margin-top: 1.5em;
+            margin-bottom: 0.5em;
+            font-size: 1.1em;
+            color: #1a1a1a;
+        }
+        #response ul {
+            margin: 0;
+            padding-left: 1.5em;
+        }
+        #response li {
+            margin-bottom: 0.25em;
+        }
+        #response hr {
+            border: none;
+            border-top: 1px solid #e5e5e5;
+            margin: 1.5em 0;
         }
     </style>
 </head>
@@ -111,7 +135,8 @@
                     throw new Error(data.error);
                 }
                 
-                response.textContent = data.response;
+                // Convert Markdown to HTML
+                response.innerHTML = marked.parse(data.response);
                 
                 // Update token usage if available
                 if (data.token_usage) {
@@ -139,6 +164,12 @@
                 loading.classList.add('hidden');
             }
         }
+
+        // Configure marked options
+        marked.setOptions({
+            breaks: true,  // Convert \n to <br>
+            gfm: true      // Enable GitHub Flavored Markdown
+        });
     </script>
 </body>
 </html>
