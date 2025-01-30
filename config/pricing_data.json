@@ -1,0 +1,7 @@
+{
+    "business_card": {"hours": 1, "rate": 50},
+    "logo_design": {"hours": 5, "rate": 50},
+    "website_design": {"hours": 20, "rate": 50},
+    "brochure": {"hours": 3, "rate": 50},
+    "social_media_post": {"hours": 2, "rate": 50}
+}

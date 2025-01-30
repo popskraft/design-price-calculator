@@ -1,0 +1,8 @@
+{
+  "name": "design-price-calculator",
+  "version": "1.0.0",
+  "description": "Design services price calculator using OpenAI",
+  "dependencies": {
+    "openai": "^4.0.0"
+  }
+}

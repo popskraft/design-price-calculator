@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.env
+
+# Token usage file
+token_usage.json
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
