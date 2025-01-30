@@ -88,34 +88,34 @@ def get_service_price(query):
     
     You MUST respond in exactly this format:
     
-    **DESIGN SERVICE QUOTE**
+    ### DESIGN SERVICE QUOTE
     ━━━━━━━━━━━━━━━━━━━━━
     
-    **SERVICE OVERVIEW**
+     ### SERVICE OVERVIEW
     - Project: [Service Name]
     - Package: [Selected Package]
     - Timeline: [Estimated Hours] hours
     - Rate: $[Hourly Rate]/hour
     
-    **PRICING BREAKDOWN**
+     ### PRICING BREAKDOWN
     - Base Package: $[Amount] ([Package Name])
     - Additional Features: [List each with price]
     - Rush Fees: [If applicable]
     - Revision Policy: [X revisions included, $Y per additional]
     - Final Price: $[Total Amount]
     
-    **PACKAGE INCLUDES**
+    ### PACKAGE INCLUDES
     [List all included features and deliverables]
     
-    **ADDITIONAL NOTES**
+     ### ADDITIONAL NOTES
     - [Pricing explanations]
     - [Important details about deliverables]
     - [Timeline considerations]
     
-    **RECOMMENDED ADD-ONS**
+     ### RECOMMENDED ADD-ONS
     - [Suggested additions that might benefit the project]
     
-    **NEXT STEPS**
+     ### NEXT STEPS
     Ready to proceed? Contact us to get started!"""
 
     try:

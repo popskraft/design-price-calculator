@@ -8,16 +8,18 @@
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
         .quote-text {
-            white-space: pre-wrap;
             font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
         }
         #response {
-            white-space: pre-wrap;
             font-family: system-ui, -apple-system, sans-serif;
+        }
+        #response h3 {
+            margin: 1rem 0 .5rem 0;
+            font-weight: bold;
         }
         #response strong {
             display: block;
-            font-size: 1.1em;
+            font-size: 1.126em;
             color: #1a1a1a;
         }
         #response ul {
@@ -102,7 +104,17 @@
             const responseDiv = document.getElementById('response');
             const loading = document.getElementById('loading');
             const tokenUsage = document.getElementById('token-usage');
+            const queryTextarea = document.getElementById('query');
             
+            // Add Enter key handler for textarea
+            queryTextarea.addEventListener('keydown', function(e) {
+                // Submit on Enter without Shift
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault(); // Prevent newline
+                    form.dispatchEvent(new Event('submit'));
+                }
+            });
+
             // Configure marked options
             marked.setOptions({
                 breaks: true,
