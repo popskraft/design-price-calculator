@@ -70,6 +70,10 @@
     </div>
 
     <script>
+        // Determine if we're running locally or on Netlify
+        const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        const API_ENDPOINT = isLocalhost ? '/api/calculate' : '/.netlify/functions/calculate';
+
         function handleKeyPress(event) {
             // Check if Enter was pressed without Shift (Shift+Enter allows for new lines)
             if (event.key === 'Enter' && !event.shiftKey) {
@@ -93,7 +97,7 @@
             result.classList.add('hidden');
 
             try {
-                const res = await fetch('/.netlify/functions/calculate', {
+                const res = await fetch(API_ENDPOINT, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
