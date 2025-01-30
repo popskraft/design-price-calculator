@@ -49,16 +49,16 @@
                         class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
                         rows="4"
                         placeholder="Example: How much would it cost to design a business card?"
-                        onkeydown="handleKeyPress(event)"
                     ></textarea>
                 </div>
 
-                <button 
-                    onclick="calculatePrice()"
-                    class="w-full bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium text-lg"
-                >
-                    Calculate Price
-                </button>
+                <form id="priceForm">
+                    <button 
+                        class="w-full bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium text-lg"
+                    >
+                        Calculate Price
+                    </button>
+                </form>
 
                 <div id="loading" class="hidden mt-6">
                     <div class="flex items-center justify-center">
@@ -92,81 +92,87 @@
     </div>
 
     <script>
-        // Determine if we're running locally or on Netlify
-        const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-        const API_ENDPOINT = isLocalhost ? '/api/calculate' : '/.netlify/functions/calculate';
+        // Define API endpoint based on environment
+        const API_ENDPOINT = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+            ? 'http://127.0.0.1:8080/api/calculate'
+            : '/.netlify/functions/calculate';
 
-        function handleKeyPress(event) {
-            // Check if Enter was pressed without Shift (Shift+Enter allows for new lines)
-            if (event.key === 'Enter' && !event.shiftKey) {
-                event.preventDefault(); // Prevent new line
-                calculatePrice(); // Trigger the calculation
-            }
-        }
-
-        async function calculatePrice() {
-            const query = document.getElementById('query').value;
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('priceForm');
+            const responseDiv = document.getElementById('response');
             const loading = document.getElementById('loading');
-            const result = document.getElementById('result');
-            const response = document.getElementById('response');
+            const tokenUsage = document.getElementById('token-usage');
+            
+            // Configure marked options
+            marked.setOptions({
+                breaks: true,
+                gfm: true,
+                silent: true // Prevents console errors from invalid markdown
+            });
 
-            if (!query) {
-                alert('Please enter your query first.');
-                return;
+            async function calculatePrice(query) {
+                try {
+                    loading.classList.remove('hidden');
+                    responseDiv.textContent = 'Calculating...';
+
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+
+                    const response = await fetch(API_ENDPOINT, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ query: query }),
+                        signal: controller.signal
+                    });
+
+                    clearTimeout(timeoutId);
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
+
+                    // Safely parse and render markdown
+                    try {
+                        const htmlContent = marked.parse(data.response);
+                        responseDiv.innerHTML = htmlContent;
+                    } catch (markdownError) {
+                        console.warn('Markdown parsing error:', markdownError);
+                        responseDiv.textContent = data.response; // Fallback to plain text
+                    }
+
+                    // Update token usage if available
+                    if (data.token_usage) {
+                        document.getElementById('prompt-tokens').textContent = data.token_usage.prompt_tokens || '0';
+                        document.getElementById('completion-tokens').textContent = data.token_usage.completion_tokens || '0';
+                        document.getElementById('total-tokens').textContent = data.token_usage.total_tokens || '0';
+                        tokenUsage.classList.remove('hidden');
+                    }
+                } catch (error) {
+                    if (error.name === 'AbortError') {
+                        responseDiv.textContent = 'Request timed out. Please try again.';
+                    } else {
+                        responseDiv.textContent = `Error: ${error.message}`;
+                    }
+                    console.error('Error:', error);
+                } finally {
+                    loading.classList.add('hidden');
+                    document.getElementById('result').classList.remove('hidden');
+                }
             }
 
-            loading.classList.remove('hidden');
-            result.classList.add('hidden');
-
-            try {
-                const res = await fetch(API_ENDPOINT, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ query }),
-                });
-
-                const data = await res.json();
-                
-                if (data.error) {
-                    throw new Error(data.error);
-                }
-                
-                // Convert Markdown to HTML
-                response.innerHTML = marked.parse(data.response);
-                
-                // Update token usage if available
-                if (data.token_usage) {
-                    document.getElementById('prompt-tokens').textContent = data.token_usage.prompt_tokens || '0';
-                    document.getElementById('completion-tokens').textContent = data.token_usage.completion_tokens || '0';
-                    document.getElementById('total-tokens').textContent = data.token_usage.total_tokens || '0';
-                } else {
-                    document.getElementById('prompt-tokens').textContent = '0';
-                    document.getElementById('completion-tokens').textContent = '0';
-                    document.getElementById('total-tokens').textContent = '0';
-                }
-                
-                result.classList.remove('hidden');
-            } catch (error) {
-                console.error('Error:', error);
-                response.textContent = `Error: ${error.message || 'Something went wrong'}. Please try again.`;
-                
-                // Reset token counters on error
-                document.getElementById('prompt-tokens').textContent = '0';
-                document.getElementById('completion-tokens').textContent = '0';
-                document.getElementById('total-tokens').textContent = '0';
-                
-                result.classList.remove('hidden');
-            } finally {
-                loading.classList.add('hidden');
-            }
-        }
-
-        // Configure marked options
-        marked.setOptions({
-            breaks: true,  // Convert \n to <br>
-            gfm: true      // Enable GitHub Flavored Markdown
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const query = document.getElementById('query').value;
+                await calculatePrice(query);
+            });
         });
     </script>
 </body>
