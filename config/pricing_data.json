@@ -1,7 +1,59 @@
 {
-    "business_card": {"hours": 1, "rate": 50},
-    "logo_design": {"hours": 5, "rate": 50},
-    "website_design": {"hours": 20, "rate": 50},
-    "brochure": {"hours": 3, "rate": 50},
-    "social_media_post": {"hours": 2, "rate": 50}
+    "business_card": {
+        "hours": 1,
+        "rate": 50,
+        "quantity_rules": {
+            "base_price": 50,
+            "bulk_discounts": [
+                {"min_quantity": 2, "discount_percent": 15},
+                {"min_quantity": 5, "discount_percent": 25}
+            ]
+        }
+    },
+    "logo_design": {
+        "hours": 5,
+        "rate": 50,
+        "quantity_rules": {
+            "base_price": 250,
+            "variations_price": 100
+        }
+    },
+    "website_design": {
+        "hours": 20,
+        "rate": 50,
+        "quantity_rules": {
+            "base_price": 1000,
+            "page_price": 200,
+            "responsive_design": 500,
+            "extra_features": {
+                "contact_form": 150,
+                "gallery": 200,
+                "blog": 300
+            }
+        }
+    },
+    "brochure": {
+        "hours": 3,
+        "rate": 50,
+        "quantity_rules": {
+            "base_price": 150,
+            "per_page_price": 50,
+            "bulk_discounts": [
+                {"min_quantity": 2, "discount_percent": 10},
+                {"min_quantity": 5, "discount_percent": 20}
+            ]
+        }
+    },
+    "social_media_post": {
+        "hours": 2,
+        "rate": 50,
+        "quantity_rules": {
+            "base_price": 100,
+            "bulk_pricing": [
+                {"quantity": 3, "price": 250},
+                {"quantity": 5, "price": 400},
+                {"quantity": 10, "price": 700}
+            ]
+        }
+    }
 }
