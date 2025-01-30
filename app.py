@@ -92,28 +92,28 @@ def get_service_price(query):
     ━━━━━━━━━━━━━━━━━━━━━
     
     **SERVICE OVERVIEW**
-    • Project: [Service Name]
-    • Package: [Selected Package]
-    • Timeline: [Estimated Hours] hours
-    • Rate: $[Hourly Rate]/hour
+    - Project: [Service Name]
+    - Package: [Selected Package]
+    - Timeline: [Estimated Hours] hours
+    - Rate: $[Hourly Rate]/hour
     
     **PRICING BREAKDOWN**
-    • Base Package: $[Amount] ([Package Name])
-    • Additional Features: [List each with price]
-    • Rush Fees: [If applicable]
-    • Revision Policy: [X revisions included, $Y per additional]
-    • Final Price: $[Total Amount]
+    - Base Package: $[Amount] ([Package Name])
+    - Additional Features: [List each with price]
+    - Rush Fees: [If applicable]
+    - Revision Policy: [X revisions included, $Y per additional]
+    - Final Price: $[Total Amount]
     
     **PACKAGE INCLUDES**
     [List all included features and deliverables]
     
     **ADDITIONAL NOTES**
-    • [Pricing explanations]
-    • [Important details about deliverables]
-    • [Timeline considerations]
+    - [Pricing explanations]
+    - [Important details about deliverables]
+    - [Timeline considerations]
     
     **RECOMMENDED ADD-ONS**
-    • [Suggested additions that might benefit the project]
+    - [Suggested additions that might benefit the project]
     
     **NEXT STEPS**
     Ready to proceed? Contact us to get started!"""
