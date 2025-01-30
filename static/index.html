@@ -109,14 +109,27 @@
                 
                 response.textContent = data.response;
                 
-                // Update token usage
-                document.getElementById('prompt-tokens').textContent = data.token_usage.prompt_tokens;
-                document.getElementById('completion-tokens').textContent = data.token_usage.completion_tokens;
-                document.getElementById('total-tokens').textContent = data.token_usage.total_tokens;
+                // Update token usage if available
+                if (data.token_usage) {
+                    document.getElementById('prompt-tokens').textContent = data.token_usage.prompt_tokens || '0';
+                    document.getElementById('completion-tokens').textContent = data.token_usage.completion_tokens || '0';
+                    document.getElementById('total-tokens').textContent = data.token_usage.total_tokens || '0';
+                } else {
+                    document.getElementById('prompt-tokens').textContent = '0';
+                    document.getElementById('completion-tokens').textContent = '0';
+                    document.getElementById('total-tokens').textContent = '0';
+                }
                 
                 result.classList.remove('hidden');
             } catch (error) {
-                response.textContent = `Error: ${error.message}. Please try again.`;
+                console.error('Error:', error);
+                response.textContent = `Error: ${error.message || 'Something went wrong'}. Please try again.`;
+                
+                // Reset token counters on error
+                document.getElementById('prompt-tokens').textContent = '0';
+                document.getElementById('completion-tokens').textContent = '0';
+                document.getElementById('total-tokens').textContent = '0';
+                
                 result.classList.remove('hidden');
             } finally {
                 loading.classList.add('hidden');
