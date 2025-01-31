@@ -34,6 +34,14 @@
             border-top: 1px solid #e5e5e5;
             margin: 1.5em 0;
         }
+        .error-message {
+            background-color: #fee2e2;
+            border: 1px solid #ef4444;
+            color: #b91c1c;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+        }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
@@ -50,12 +58,15 @@
                         id="query" 
                         class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
                         rows="4"
-                        placeholder="Example: How much would it cost to design a business card?"
+                        placeholder="Example: I need a logo design for my new business"
                     ></textarea>
                 </div>
 
+                <div id="error" class="error-message hidden"></div>
+
                 <form id="priceForm">
                     <button 
+                        type="submit"
                         class="w-full bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium text-lg"
                     >
                         Calculate Price
@@ -65,6 +76,7 @@
                 <div id="loading" class="hidden mt-6">
                     <div class="flex items-center justify-center">
                         <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500"></div>
+                        <span class="ml-3 text-gray-600">Calculating your quote...</span>
                     </div>
                 </div>
 
@@ -82,67 +94,93 @@
                     </div>
                 </div>
             </div>
-
-            <div class="bg-white rounded-xl shadow-lg p-6">
-                <h2 class="text-xl font-semibold mb-4 text-gray-800">Total Usage Statistics:</h2>
-                <div id="total-usage" class="space-y-2 text-gray-700">
-                    <p>Total Tokens Used: <span id="grand-total-tokens">0</span></p>
-                    <p>Total Requests: <span id="total-requests">0</span></p>
-                </div>
-            </div>
         </div>
     </div>
 
     <script>
-        // Define API endpoint based on environment
-        const API_ENDPOINT = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-            ? 'http://127.0.0.1:8080/api/calculate'
-            : '/.netlify/functions/calculate';
+        // Environment detection and API configuration
+        const ENV = {
+            isDevelopment: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1',
+            get apiEndpoint() {
+                return this.isDevelopment
+                    ? 'http://localhost:8080/api/calculate'
+                    : '/.netlify/functions/calculate';
+            }
+        };
 
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('priceForm');
-            const responseDiv = document.getElementById('response');
-            const loading = document.getElementById('loading');
-            const tokenUsage = document.getElementById('token-usage');
-            const queryTextarea = document.getElementById('query');
-            
-            // Add Enter key handler for textarea
-            queryTextarea.addEventListener('keydown', function(e) {
-                // Submit on Enter without Shift
+        class PriceCalculator {
+            constructor() {
+                this.form = document.getElementById('priceForm');
+                this.queryInput = document.getElementById('query');
+                this.responseDiv = document.getElementById('response');
+                this.loading = document.getElementById('loading');
+                this.result = document.getElementById('result');
+                this.error = document.getElementById('error');
+                
+                this.setupEventListeners();
+                this.setupMarkdown();
+            }
+
+            setupEventListeners() {
+                this.form.addEventListener('submit', (e) => this.handleSubmit(e));
+                this.queryInput.addEventListener('keydown', (e) => this.handleKeydown(e));
+            }
+
+            setupMarkdown() {
+                marked.setOptions({
+                    breaks: true,
+                    gfm: true,
+                    silent: true
+                });
+            }
+
+            handleKeydown(e) {
                 if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault(); // Prevent newline
-                    form.dispatchEvent(new Event('submit'));
+                    e.preventDefault();
+                    this.form.dispatchEvent(new Event('submit'));
                 }
-            });
+            }
 
-            // Configure marked options
-            marked.setOptions({
-                breaks: true,
-                gfm: true,
-                silent: true // Prevents console errors from invalid markdown
-            });
+            showError(message) {
+                this.error.textContent = message;
+                this.error.classList.remove('hidden');
+                setTimeout(() => {
+                    this.error.classList.add('hidden');
+                }, 5000);
+            }
 
-            async function calculatePrice(query) {
+            updateTokenUsage(usage) {
+                document.getElementById('prompt-tokens').textContent = usage.prompt_tokens;
+                document.getElementById('completion-tokens').textContent = usage.completion_tokens;
+                document.getElementById('total-tokens').textContent = usage.total_tokens;
+            }
+
+            showLoading(show) {
+                this.loading.classList.toggle('hidden', !show);
+                this.result.classList.toggle('hidden', show);
+            }
+
+            async calculatePrice(query) {
                 try {
-                    loading.classList.remove('hidden');
-                    responseDiv.textContent = 'Calculating...';
+                    this.showLoading(true);
+                    this.error.classList.add('hidden');
 
                     const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+                    const timeoutId = setTimeout(() => controller.abort(), 30000);
 
-                    const response = await fetch(API_ENDPOINT, {
+                    const response = await fetch(ENV.apiEndpoint, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
                         },
-                        body: JSON.stringify({ query: query }),
+                        body: JSON.stringify({ query }),
                         signal: controller.signal
                     });
 
                     clearTimeout(timeoutId);
 
                     if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
+                        throw new Error(`Request failed with status ${response.status}`);
                     }
 
                     const data = await response.json();
@@ -151,40 +189,41 @@
                         throw new Error(data.error);
                     }
 
-                    // Safely parse and render markdown
-                    try {
-                        const htmlContent = marked.parse(data.response);
-                        responseDiv.innerHTML = htmlContent;
-                    } catch (markdownError) {
-                        console.warn('Markdown parsing error:', markdownError);
-                        responseDiv.textContent = data.response; // Fallback to plain text
-                    }
-
-                    // Update token usage if available
-                    if (data.token_usage) {
-                        document.getElementById('prompt-tokens').textContent = data.token_usage.prompt_tokens || '0';
-                        document.getElementById('completion-tokens').textContent = data.token_usage.completion_tokens || '0';
-                        document.getElementById('total-tokens').textContent = data.token_usage.total_tokens || '0';
-                        tokenUsage.classList.remove('hidden');
-                    }
+                    this.responseDiv.innerHTML = marked.parse(data.response);
+                    this.updateTokenUsage(data.token_usage);
+                    this.result.classList.remove('hidden');
                 } catch (error) {
-                    if (error.name === 'AbortError') {
-                        responseDiv.textContent = 'Request timed out. Please try again.';
-                    } else {
-                        responseDiv.textContent = `Error: ${error.message}`;
-                    }
                     console.error('Error:', error);
+                    this.showError(error.message === 'The user aborted a request.'
+                        ? 'Request timed out. Please try again.'
+                        : `Error: ${error.message}`);
                 } finally {
-                    loading.classList.add('hidden');
-                    document.getElementById('result').classList.remove('hidden');
+                    this.showLoading(false);
                 }
             }
 
-            form.addEventListener('submit', async function(e) {
+            async handleSubmit(e) {
                 e.preventDefault();
-                const query = document.getElementById('query').value;
-                await calculatePrice(query);
-            });
+                const query = this.queryInput.value.trim();
+                
+                if (!query) {
+                    this.showError('Please enter your design service request');
+                    return;
+                }
+
+                await this.calculatePrice(query);
+            }
+        }
+
+        // Initialize the calculator when the DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            window.priceCalculator = new PriceCalculator();
+            
+            // Log environment info
+            if (ENV.isDevelopment) {
+                console.log('Running in development mode');
+                console.log('API Endpoint:', ENV.apiEndpoint);
+            }
         });
     </script>
 </body>
