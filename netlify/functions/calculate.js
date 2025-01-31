@@ -1,9 +1,8 @@
-const { OpenAI } = require('openai');
+const axios = require('axios');
 const { PRICING_DATA } = require('../../shared/pricing_data.js');
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-});
+const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
 exports.handler = async function(event, context) {
   // Add CORS headers
@@ -100,18 +99,27 @@ exports.handler = async function(event, context) {
     ### NEXT STEPS
     Ready to proceed? Contact us to get started!`;
 
-    const completion = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
-      messages: [
-        { role: "system", content: systemMessage },
-        { role: "user", content: query }
-      ],
-      temperature: 0.7,
-      max_tokens: 500
-    });
+    const response = await axios.post(
+      OPENAI_API_URL,
+      {
+        model: 'gpt-3.5-turbo',
+        messages: [
+          { role: 'system', content: systemMessage },
+          { role: 'user', content: query }
+        ],
+        temperature: 0.7,
+        max_tokens: 500
+      },
+      {
+        headers: {
+          'Authorization': `Bearer ${OPENAI_API_KEY}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
 
-    const usage = completion.usage || { prompt_tokens: 0, completion_tokens: 0 };
-    const responseText = completion.choices[0]?.message?.content || 'No response generated';
+    const responseText = response.data.choices[0]?.message?.content || 'No response generated';
+    const usage = response.data.usage || { prompt_tokens: 0, completion_tokens: 0 };
 
     return {
       statusCode: 200,
@@ -126,12 +134,12 @@ exports.handler = async function(event, context) {
       })
     };
   } catch (error) {
-    console.error('Error:', error);
+    console.error('Error:', error.response?.data || error.message);
     return {
       statusCode: 500,
       headers,
       body: JSON.stringify({ 
-        error: error.message,
+        error: error.response?.data?.error || error.message,
         token_usage: {
           prompt_tokens: 0,
           completion_tokens: 0,

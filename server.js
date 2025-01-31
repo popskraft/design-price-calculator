@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const { OpenAI } = require('openai');
+const axios = require('axios');
 require('dotenv').config();
 
 const app = express();
@@ -9,14 +9,13 @@ const port = process.env.PORT || 8080;
 // Import pricing data
 const { PRICING_DATA } = require('./shared/pricing_data.js');
 
-// Configure OpenAI
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-});
-
 app.use(cors());
 app.use(express.json());
 app.use(express.static('static'));
+
+// OpenAI API configuration
+const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
 // Endpoint for price calculation
 app.post('/api/calculate', async (req, res) => {
@@ -86,20 +85,29 @@ app.post('/api/calculate', async (req, res) => {
     ### NEXT STEPS
     Ready to proceed? Contact us to get started!`;
 
-    const completion = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
-      messages: [
-        { role: "system", content: systemMessage },
-        { role: "user", content: query }
-      ],
-      temperature: 0.7,
-      max_tokens: 500
-    });
+    const response = await axios.post(
+      OPENAI_API_URL,
+      {
+        model: 'gpt-3.5-turbo',
+        messages: [
+          { role: 'system', content: systemMessage },
+          { role: 'user', content: query }
+        ],
+        temperature: 0.7,
+        max_tokens: 500
+      },
+      {
+        headers: {
+          'Authorization': `Bearer ${OPENAI_API_KEY}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
 
-    const usage = completion.usage || { prompt_tokens: 0, completion_tokens: 0 };
-    const responseText = completion.choices[0]?.message?.content || 'No response generated';
+    const responseText = response.data.choices[0]?.message?.content || 'No response generated';
+    const usage = response.data.usage || { prompt_tokens: 0, completion_tokens: 0 };
 
-    res.json({
+    res.status(200).json({
       response: responseText,
       token_usage: {
         prompt_tokens: usage.prompt_tokens || 0,
@@ -108,9 +116,9 @@ app.post('/api/calculate', async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Error:', error);
+    console.error('Error:', error.response?.data || error.message);
     res.status(500).json({ 
-      error: error.message,
+      error: error.response?.data?.error || error.message,
       token_usage: {
         prompt_tokens: 0,
         completion_tokens: 0,
@@ -121,5 +129,5 @@ app.post('/api/calculate', async (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
+  console.log(`Server running on port ${port}`);
 });
