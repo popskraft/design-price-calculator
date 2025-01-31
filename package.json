@@ -10,6 +10,7 @@
     "watch:css": "tailwindcss -i ./src/input.css -o ./static/output.css --watch"
   },
   "dependencies": {
+    "axios": "^1.7.9",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
