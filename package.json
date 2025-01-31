@@ -5,7 +5,9 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "build:css": "tailwindcss -i ./src/input.css -o ./static/output.css",
+    "watch:css": "tailwindcss -i ./src/input.css -o ./static/output.css --watch"
   },
   "dependencies": {
     "cors": "^2.8.5",
@@ -14,6 +16,9 @@
     "openai": "^4.0.0"
   },
   "devDependencies": {
-    "nodemon": "^2.0.22"
+    "autoprefixer": "^10.4.14",
+    "nodemon": "^2.0.22",
+    "postcss": "^8.4.23",
+    "tailwindcss": "^3.3.2"
   }
 }

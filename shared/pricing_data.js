@@ -43,9 +43,21 @@ const PRICING_DATA = {
                         "Mobile-optimized version"
                     ]
                 }
+            },
+            "add_ons": {
+                "additional_slide": 40,
+                "custom_infographic": 100,
+                "animation_package": 200,
+                "template_variation": 150,
+                "presentation_training": 300
             }
+        },
+        "rush_fees": {
+            "48_hours": 0.5,
+            "24_hours": 0.75
         }
     },
+
     "logo_brand_identity": {
         "description": "Comprehensive brand identity development",
         "hours": 20,
@@ -58,7 +70,9 @@ const PRICING_DATA = {
                     "deliverables": [
                         "Logo (2 concepts)",
                         "Basic color palette",
-                        "Simple style guide"
+                        "Simple style guide",
+                        "AI-Generated Mood Board",
+                        "Basic brand guidelines PDF"
                     ]
                 },
                 "optimal": {
@@ -66,14 +80,38 @@ const PRICING_DATA = {
                     "deliverables": [
                         "Logo (3 concepts)",
                         "Extended color palette",
-                        "Comprehensive style guide"
+                        "Typography system",
+                        "Comprehensive style guide",
+                        "Social media kit",
+                        "Digital brand book",
+                        "AI-Enhanced brand illustrations (3)",
+                        "Brand voice guidelines"
+                    ]
+                },
+                "premium": {
+                    "price": 3500,
+                    "deliverables": [
+                        "Logo (5 concepts)",
+                        "Complete color system",
+                        "Advanced typography system",
+                        "Interactive brand guidelines",
+                        "Comprehensive social media kit",
+                        "Custom AI illustration system",
+                        "Motion design guidelines",
+                        "Brand training session",
+                        "3D logo variations"
                     ]
                 }
             }
+        },
+        "rush_fees": {
+            "5_days": 0.5,
+            "3_days": 0.75
         }
     },
+
     "enterprise_website": {
-        "description": "Custom enterprise-level websites",
+        "description": "Custom enterprise-level ProcessWire websites",
         "hours": 80,
         "rate": 50,
         "quantity_rules": {
@@ -82,24 +120,226 @@ const PRICING_DATA = {
                 "economy": {
                     "price": 4000,
                     "features": [
-                        "Basic website setup",
-                        "Standard templates",
-                        "Mobile responsive"
+                        "ProcessWire CMS setup",
+                        "Basic theme customization",
+                        "Standard SEO setup",
+                        "Up to 5 templates",
+                        "Mobile responsive",
+                        "Basic security package"
                     ]
                 },
                 "optimal": {
                     "price": 8000,
                     "features": [
-                        "Custom theme",
-                        "Advanced SEO",
-                        "Performance optimization"
+                        "Custom theme development",
+                        "Advanced SEO implementation",
+                        "Up to 15 templates",
+                        "Enhanced security package",
+                        "Performance optimization",
+                        "Custom admin interface",
+                        "API integration"
+                    ]
+                },
+                "premium": {
+                    "price": 15000,
+                    "features": [
+                        "Custom module development",
+                        "International SEO setup",
+                        "Unlimited templates",
+                        "Advanced security suite",
+                        "CDN integration",
+                        "Custom API development",
+                        "1 year support package"
                     ]
                 }
             }
+        },
+        "rush_fees": {
+            "4_weeks": 0.3,
+            "2_weeks": 0.6
+        }
+    },
+
+    "quick_websites": {
+        "description": "Fast-turnaround websites and landing pages",
+        "hours": 20,
+        "rate": 50,
+        "quantity_rules": {
+            "base_price": 1000,
+            "packages": {
+                "economy": {
+                    "price": 1000,
+                    "features": [
+                        "Single page design",
+                        "Mobile responsive",
+                        "Basic SEO setup",
+                        "Contact form",
+                        "3 content sections"
+                    ]
+                },
+                "optimal": {
+                    "price": 2000,
+                    "features": [
+                        "Up to 5 pages",
+                        "Mobile responsive",
+                        "Standard SEO setup",
+                        "Custom forms",
+                        "CMS integration",
+                        "Social media integration"
+                    ]
+                },
+                "premium": {
+                    "price": 3500,
+                    "features": [
+                        "Up to 10 pages",
+                        "Advanced SEO setup",
+                        "Custom animations",
+                        "Blog setup",
+                        "Basic e-commerce",
+                        "Analytics dashboard"
+                    ]
+                }
+            }
+        },
+        "rush_fees": {
+            "1_week": 0.4,
+            "3_days": 0.7
+        }
+    },
+
+    "print_materials": {
+        "description": "Print design services",
+        "hours": 8,
+        "rate": 50,
+        "quantity_rules": {
+            "base_price": 400,
+            "packages": {
+                "economy": {
+                    "price": 400,
+                    "deliverables": [
+                        "Single-sided design",
+                        "Standard templates",
+                        "Stock images",
+                        "1 revision round"
+                    ]
+                },
+                "optimal": {
+                    "price": 800,
+                    "deliverables": [
+                        "Double-sided design",
+                        "Custom design",
+                        "Premium stock images",
+                        "Basic infographics",
+                        "2 revision rounds"
+                    ]
+                },
+                "premium": {
+                    "price": 1500,
+                    "deliverables": [
+                        "Multi-page design",
+                        "Custom illustrations",
+                        "Complex infographics",
+                        "Premium paper selection",
+                        "3 revision rounds"
+                    ]
+                }
+            }
+        },
+        "rush_fees": {
+            "48_hours": 0.5,
+            "24_hours": 0.75
+        }
+    },
+
+    "social_media_design": {
+        "description": "Social media graphics and templates",
+        "hours": 6,
+        "rate": 50,
+        "quantity_rules": {
+            "base_price": 300,
+            "packages": {
+                "economy": {
+                    "price": 300,
+                    "posts": 5,
+                    "features": [
+                        "Single platform",
+                        "Basic templates",
+                        "Stock images"
+                    ]
+                },
+                "optimal": {
+                    "price": 600,
+                    "posts": 10,
+                    "features": [
+                        "2 platforms",
+                        "Custom templates",
+                        "Content calendar",
+                        "Basic animations"
+                    ]
+                },
+                "premium": {
+                    "price": 1200,
+                    "posts": 20,
+                    "features": [
+                        "All platforms",
+                        "Custom illustrations",
+                        "Advanced animations",
+                        "Strategy guide"
+                    ]
+                }
+            }
+        },
+        "rush_fees": {
+            "48_hours": 0.4,
+            "24_hours": 0.6
+        }
+    },
+
+    "ui_ux_design": {
+        "description": "User interface and experience design",
+        "hours": 30,
+        "rate": 50,
+        "quantity_rules": {
+            "base_price": 1500,
+            "packages": {
+                "economy": {
+                    "price": 1500,
+                    "features": [
+                        "5 key screens",
+                        "Basic wireframes",
+                        "Standard UI elements",
+                        "Simple prototype"
+                    ]
+                },
+                "optimal": {
+                    "price": 3000,
+                    "features": [
+                        "10 screens",
+                        "Detailed wireframes",
+                        "Custom UI kit",
+                        "Interactive prototype",
+                        "User flow diagrams"
+                    ]
+                },
+                "premium": {
+                    "price": 5000,
+                    "features": [
+                        "20 screens",
+                        "Design system",
+                        "Micro-interactions",
+                        "Advanced prototype",
+                        "Usability testing"
+                    ]
+                }
+            }
+        },
+        "rush_fees": {
+            "2_weeks": 0.35,
+            "1_week": 0.65
         }
     }
 };
-
+ 
 // For Node.js (Netlify)
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = { PRICING_DATA };
